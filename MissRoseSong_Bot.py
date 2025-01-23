@@ -31,7 +31,7 @@ def time_to_seconds(time):
 @bot.on_message(filters.command(['start']))
 def start(client, message):
     darkprince = f'👋 Hello @{message.from_user.username}\n\n [😌🍀🤚](https://telegra.ph/file/86cc2e654b1157f12b94f.jpg)\n I\'m Rose, I can upload songs from YouTube. Type /a song name:'
-    message.reply_text(
+    message.reply(
         text=darkprince, 
         quote=False,
         reply_markup=InlineKeyboardMarkup(
@@ -56,27 +56,26 @@ def a(client, message):
         results = []
         count = 0
         while len(results) == 0 and count < 6:
-            if count>0:
+            if count > 0:
                 time.sleep(1)
             results = YoutubeSearch(query, max_results=1).to_dict()
             count += 1
-        # results = YoutubeSearch(query, max_results=1).to_dict()
         try:
             link = f"https://youtube.com{results[0]['url_suffix']}"
-            # print(results)
             title = results[0]["title"]
             thumbnail = results[0]["thumbnails"][0]
             duration = results[0]["duration"]
 
-            ## UNCOMMENT THIS IF YOU WANT A LIMIT ON DURATION. CHANGE 1800 TO YOUR OWN PREFFERED DURATION AND EDIT THE MESSAGE (30 minutes cap) LIMIT IN SECONDS
+            ## UNCOMMENT THIS IF YOU WANT A LIMIT ON DURATION. CHANGE 1800 TO YOUR OWN PREFERRED DURATION (30 minutes cap)
             # if time_to_seconds(duration) >= 1800:  # duration limit
             #     m.edit("Exceeded 30mins cap")
             #     return
 
             views = results[0]["views"]
-            thumb_name = f'thumb{message.message_id}.jpg'
+            thumb_name = f'thumb{message.id}.jpg'
             thumb = requests.get(thumbnail, allow_redirects=True)
-            open(thumb_name, 'wb').write(thumb.content)
+            with open(thumb_name, 'wb') as f:
+                f.write(thumb.content)
 
         except Exception as e:
             print(e)
@@ -84,7 +83,7 @@ def a(client, message):
             return
     except Exception as e:
         m.edit(
-            "✖️ Found Nothing. Sorry.\n\nTry another keywork or maybe spell it properly."
+            "✖️ Found Nothing. Sorry.\n\nTry another keyword or maybe spell it properly."
         )
         print(str(e))
         return
